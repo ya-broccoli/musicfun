@@ -46,7 +46,7 @@ export const PlaylistList = ({ playlists, isPlaylistsLoading }: Props) => {
                 const isEditing = playlist.id === playlistId
 
                 return (
-                    <div className={s.item}>
+                    <div className={s.item} key={playlist.id}>
                         {
                             isEditing
                                 ? <EditPlaylistForm

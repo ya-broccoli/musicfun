@@ -11,10 +11,10 @@ export const PlaylistsPage = () => {
     const [search, setSearch] = useState('')
 
     const [currentPage, setCurrentPage] = useState(1)
-    const [pageSize, setPageSize] = useState(8)
+    const [pageSize, setPageSize] = useState(2)
 
     const debounceSearch = useDebounceValue(search)
-    const {data, isLoading} = useFetchPlaylistsQuery({
+    const {data, currentData, isLoading} = useFetchPlaylistsQuery({
         search: debounceSearch,
         pageNumber: currentPage,
         pageSize,
@@ -24,6 +24,7 @@ export const PlaylistsPage = () => {
     //     skipPollingIfUnfocused: true
     // }
     )
+    console.log({data, currentData})
 
     const changePageSizeHandler = (size: number) => {
         setPageSize(size)
@@ -34,6 +35,8 @@ export const PlaylistsPage = () => {
         setCurrentPage(1)
         setSearch(value)
     }
+
+    if(isLoading) return <p style={{fontSize: '26px', fontWeight: '700'}}>Skeleton is loading...</p>
 
     return (
         <div className={s.container}>
