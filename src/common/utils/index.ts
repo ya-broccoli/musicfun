@@ -1,1 +1,6 @@
 export { getPaginationPages } from './getPaginationPages'
+export { isErrorWithProperty } from './isErrorWithProperty'
+export { isErrorWithDetailArray } from './isErrorWithDetailArray'
+export { trimToMaxLength } from './trimToMaxLength'
+export { handlerErrors } from './handlerErrors'
+export { errorToast } from './errorToast'

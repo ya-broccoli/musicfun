@@ -5,6 +5,7 @@ import {CreatePlaylistForm} from '@/features/playlists/ui/PlaylistsPage/CreatePl
 import {useDebounceValue} from '@/common/hooks';
 import {Pagination} from '@/common/components';
 import {PlaylistList} from '@/features/playlists/ui/PlaylistsPage/PlaylistList/PlaylistList';
+import {toast} from 'react-toastify';
 
 export const PlaylistsPage = () => {
 
@@ -14,17 +15,30 @@ export const PlaylistsPage = () => {
     const [pageSize, setPageSize] = useState(2)
 
     const debounceSearch = useDebounceValue(search)
-    const {data, currentData, isLoading} = useFetchPlaylistsQuery({
-        search: debounceSearch,
-        pageNumber: currentPage,
-        pageSize,
-    },
-    //     {
-    //     pollingInterval: 3000,
-    //     skipPollingIfUnfocused: true
-    // }
+    const {data, currentData, isLoading, error} = useFetchPlaylistsQuery({
+            search: debounceSearch,
+            pageNumber: currentPage,
+            pageSize,
+        },
+        //     {
+        //     pollingInterval: 3000,
+        //     skipPollingIfUnfocused: true
+        // }
     )
-    console.log({data, currentData})
+
+    if (error) {
+        if('status' in error) {
+            // FetchBaseQueryError
+            const errMessage = 'error' in error
+                ? error.error
+                : (error.data as {error: string}).error || (error.data as {message: string}).message || 'Some error occurred'
+            toast(errMessage, {type: 'error', theme: 'colored'})
+        } else {
+            // SerializedError
+            const errMessage = error.message || 'Some error occurred'
+            toast(errMessage, {type: 'error', theme: 'colored'})
+        }
+    }
 
     const changePageSizeHandler = (size: number) => {
         setPageSize(size)
@@ -36,7 +50,7 @@ export const PlaylistsPage = () => {
         setSearch(value)
     }
 
-    if(isLoading) return <p style={{fontSize: '26px', fontWeight: '700'}}>Skeleton is loading...</p>
+    if (isLoading) return <p style={{fontSize: '26px', fontWeight: '700'}}>Skeleton is loading...</p>
 
     return (
         <div className={s.container}>
@@ -47,7 +61,7 @@ export const PlaylistsPage = () => {
                 placeholder="Search playlist by title"
                 onChange={(e) => onChangeSearchHandler(e.currentTarget.value)}
             />
-            <PlaylistList playlists={data?.data || []} isPlaylistsLoading={isLoading} />
+            <PlaylistList playlists={data?.data || []} isPlaylistsLoading={isLoading}/>
             <Pagination
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}

@@ -15,7 +15,6 @@ export const useGlobalLoading = () => {
         const queries = Object.values(state.baseApi.queries || [])
         const mutations = Object.values(state.baseApi.mutations || [])
 
-        debugger
         const hasActiveQueries = queries.some(q => {
             if(q?.status !== 'pending') return
 

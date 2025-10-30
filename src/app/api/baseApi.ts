@@ -1,13 +1,12 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import {handlerErrors} from '@/common/utils';
 
 export const baseApi = createApi({
     reducerPath: 'baseApi',
     tagTypes: ['Playlist'],
     baseQuery: async (args, api, extraOptions) => {
 
-        await new Promise((res) => setTimeout(res, 2000))
-
-        return fetchBaseQuery({
+        const result = await fetchBaseQuery({
             baseUrl: import.meta.env.VITE_BASE_URL,
             headers: {
                 'API-KEY': import.meta.env.VITE_API_KEY,
@@ -18,7 +17,11 @@ export const baseApi = createApi({
             },
         })(args, api, extraOptions)
 
+        if(result.error) {
+            handlerErrors(result.error)
+        }
 
+        return result
     },
     // keepUnusedDataFor: 86400,
     // refetchOnFocus: true,
