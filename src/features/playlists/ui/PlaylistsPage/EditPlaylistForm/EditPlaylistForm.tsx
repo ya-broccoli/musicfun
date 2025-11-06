@@ -17,7 +17,10 @@ export const EditPlaylistForm = ({ playlist, editPlaylist, setPlaylistId, handle
 
     const onSubmit: SubmitHandler<UpdatePlaylistArgs> = (body: UpdatePlaylistArgs) => {
         if(!playlist) return
-        updatePlaylist({playlistId: playlist.id, body}).then(() => setPlaylistId(null))
+        updatePlaylist({playlistId: playlist.id, body})
+        setPlaylistId(null)
+        // так было до optimistic update, мы ждали завершения запроса
+        // updatePlaylist({playlistId: playlist.id, body}).then(() => setPlaylistId(null))
     }
 
     return (
