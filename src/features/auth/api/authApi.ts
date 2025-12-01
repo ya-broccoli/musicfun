@@ -1,13 +1,47 @@
 import {baseApi} from '@/app/api/baseApi';
-import {MeResponse} from '@/features/auth/api/authApi.types';
+import {LoginArgs, LoginResponse, MeResponse} from '@/features/auth/api/authApi.types';
+import {AUTH_KEYS} from '@/common/constants';
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (build) => ({
         getMe: build.query<MeResponse, void>({
             query: () => ({url: '/auth/me'}),
+            providesTags: ['Auth'],
         }),
+        login: build.mutation<LoginResponse, LoginArgs>({
+            query: (payload) => ({
+                method: 'post',
+                url: '/auth/login',
+                body: {...payload, accessTokenTTL: '15m'}
+            }),
+            onQueryStarted: async (_args, {dispatch, queryFulfilled}) => {
+                const {data} = await queryFulfilled
+                localStorage.setItem(AUTH_KEYS.accessToken, data.accessToken)
+                localStorage.setItem(AUTH_KEYS.refreshToken, data.refreshToken)
 
+                // инвалидируем запорос после каждого сохранения токена
+                dispatch(authApi.util.invalidateTags(['Auth']))
+            }
+        }),
+        logout: build.mutation<void, void>({
+            query: () => {
+                const refreshToken = localStorage.getItem(AUTH_KEYS.refreshToken)
+                return {
+                    method: 'post',
+                    url: 'auth/logout',
+                    body: { refreshToken }
+                }
+            },
+            onQueryStarted: async (_args, {dispatch, queryFulfilled}) => {
+                await queryFulfilled
+                localStorage.removeItem(AUTH_KEYS.accessToken)
+                localStorage.removeItem(AUTH_KEYS.refreshToken)
+
+                // инвалидируем запорос после каждого сохранения токена
+                dispatch(authApi.util.resetApiState())
+            }
+        })
     }),
 })
 
-export const { useGetMeQuery } = authApi;
+export const {useGetMeQuery, useLoginMutation, useLogoutMutation} = authApi;

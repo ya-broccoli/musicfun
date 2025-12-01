@@ -58,7 +58,6 @@ export const playlistsApi = baseApi.injectEndpoints({
                         )
                     )
                 })
-
                 // const patchCollection = dispatch(
                 //     playlistsApi.util.updateQueryData(
                 //         'fetchPlaylists',
@@ -79,7 +78,6 @@ export const playlistsApi = baseApi.injectEndpoints({
                 //         }
                 //     ),
                 // )
-
                 try {
                     // console.log('3')
                     await queryFulfilled
@@ -91,7 +89,6 @@ export const playlistsApi = baseApi.injectEndpoints({
                     // patchCollection.undo()
                     // console.log('6 error')
                 }
-
             },
             invalidatesTags: ['Playlist'],
         }),
