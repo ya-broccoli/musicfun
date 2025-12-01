@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router'
+import {Link, NavLink} from 'react-router'
 import s from './Header.module.css'
 import React from 'react'
 import {Path} from '@/common/routing';
@@ -10,7 +10,6 @@ export const Header = () => {
         { to: Path.Main, label: 'Main' },
         { to: Path.Playlists, label: 'Playlists' },
         { to: Path.Tracks, label: 'Tracks' },
-        { to: Path.Profile, label: 'Profile' },
     ]
 
     const {data} = useGetMeQuery()
@@ -36,7 +35,7 @@ export const Header = () => {
             </nav>
             {data && (
                 <div className={s.loginContainer}>
-                    <p>{data.login}</p>
+                    <Link to={Path.Profile}>{data.login}</Link>
                     <button onClick={logoutHandler}>logout</button>
                 </div>
             )}

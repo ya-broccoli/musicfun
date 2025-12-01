@@ -37,7 +37,7 @@ export const authApi = baseApi.injectEndpoints({
                 localStorage.removeItem(AUTH_KEYS.accessToken)
                 localStorage.removeItem(AUTH_KEYS.refreshToken)
 
-                // инвалидируем запорос после каждого сохранения токена
+                // инвалидируем запрос после каждого сохранения токена
                 dispatch(authApi.util.resetApiState())
             }
         })
