@@ -1,22 +1,32 @@
-import {
-    CreatePlaylistArgs, FetchPlaylistsArgs,
-    PlaylistData,
-    PlaylistsResponse,
-    UpdatePlaylistArgs
-} from '@/features/playlists/api/playlistsApi.types';
+import {CreatePlaylistArgs, FetchPlaylistsArgs, UpdatePlaylistArgs} from '@/features/playlists/api/playlistsApi.types';
 import {baseApi} from '@/app/api/baseApi';
 import {Images} from '@/common/types';
+import {playlistCreateResponseSchema, playlistsResponseSchema} from '@/features/playlists/model/playlists.schemas';
+import {imagesSchema} from '@/common/schemas';
+import {withZodCatch} from '@/common/utils';
 
 export const playlistsApi = baseApi.injectEndpoints({
     endpoints: (build) => ({
-        fetchPlaylists: build.query<PlaylistsResponse, FetchPlaylistsArgs>({
-            query: (params) => ({
+        // когда у нас есть схема, можно не указывать тип ответа для query или mutation
+        fetchPlaylists: build.query({
+            query: (params: FetchPlaylistsArgs) => ({
                 url: 'playlists', params
             }),
+            // responseSchema: playlistsResponseSchema,
+            // catchSchemaFailure: (err) => {
+            //     errorToast('Zod error. Details in the console', err.issues)
+            //     return {
+            //         status: 'CUSTOM_ERROR',
+            //         error: 'SchemaValidation failed',
+            //     }
+            // },
+            ...withZodCatch(playlistsResponseSchema),
+            // skipSchemaValidation: process.env.NODE_ENV === 'production',
             providesTags: ['Playlist'],
         }),
-        createPlaylist: build.mutation<{ data: PlaylistData }, CreatePlaylistArgs>({
-            query: (body) => ({method: 'post', url: 'playlists', body}),
+        createPlaylist: build.mutation({
+            query: (body: CreatePlaylistArgs) => ({method: 'post', url: 'playlists', body}),
+            ...withZodCatch(playlistCreateResponseSchema),
             invalidatesTags: ['Playlist'],
         }),
         deletePlaylist: build.mutation<void, string>({
@@ -99,6 +109,7 @@ export const playlistsApi = baseApi.injectEndpoints({
 
                 return ({method: 'post', url: `playlists/${playlistId}/images/main`, body: formData})
             },
+            ...withZodCatch(imagesSchema),
             invalidatesTags: ['Playlist'],
         }),
         deletePlaylistCover: build.mutation<void, string>({

@@ -1,19 +1,23 @@
 import {baseApi} from '@/app/api/baseApi';
 import {LoginArgs, LoginResponse, MeResponse} from '@/features/auth/api/authApi.types';
 import {AUTH_KEYS} from '@/common/constants';
+import {loginResponseSchema, meResponseSchema} from '@/features/auth/model/auth.schemas';
+import {withZodCatch} from '@/common/utils';
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (build) => ({
-        getMe: build.query<MeResponse, void>({
+        getMe: build.query({
             query: () => ({url: '/auth/me'}),
+            ...withZodCatch(meResponseSchema),
             providesTags: ['Auth'],
         }),
-        login: build.mutation<LoginResponse, LoginArgs>({
-            query: (payload) => ({
+        login: build.mutation({
+            query: (payload: LoginArgs) => ({
                 method: 'post',
                 url: '/auth/login',
                 body: {...payload, accessTokenTTL: '15m'}
             }),
+            ...withZodCatch(loginResponseSchema),
             onQueryStarted: async (_args, {dispatch, queryFulfilled}) => {
                 const {data} = await queryFulfilled
                 localStorage.setItem(AUTH_KEYS.accessToken, data.accessToken)
@@ -21,7 +25,7 @@ export const authApi = baseApi.injectEndpoints({
 
                 // инвалидируем запорос после каждого сохранения токена
                 dispatch(authApi.util.invalidateTags(['Auth']))
-            }
+            },
         }),
         logout: build.mutation<void, void>({
             query: () => {

@@ -9,4 +9,5 @@ export const baseApi = createApi({
     // refetchOnFocus: true,
     // refetchOnReconnect: true,
     endpoints: () => ({}),
+    // skipSchemaValidation: process.env.NODE_ENV === 'production',
 })
